@@ -1,0 +1,5 @@
+export enum StatusCode {
+  ERROR_DATA_CODE = 400,
+  ERROR_NOT_FOUND_CODE = 404,
+  ERROR_DEFAULT_CODE = 500,
+}
