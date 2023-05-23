@@ -4,7 +4,8 @@ import express, { json } from "express";
 import mongoose from "mongoose";
 import routers from "./routes";
 import { tmpAuth } from "./tmp";
-import { Request, Response, NextFunction } from "express";
+import { sendMessageError } from "./error/error";
+
 const { PORT = 3000, MONGO_URL = "none" } = process.env;
 
 const app = express();
@@ -14,10 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(tmpAuth);
 
 app.use("/", routers);
-
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  res.send({ message: err.message });
-});
+app.use(sendMessageError);
 
 async function connection() {
   try {

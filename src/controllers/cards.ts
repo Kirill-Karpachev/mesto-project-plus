@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import card from "../models/card";
 import { IRequest } from "types/types";
 import { ObjectId } from "mongoose";
+import { dataError, defaultError, notFoundError } from "../error/error";
 
 interface ICardController {
   getCards(
@@ -40,17 +41,24 @@ class CardController implements ICardController {
     try {
       const cards = await card.find({});
       return res.send({ data: cards });
-    } catch (error) {}
+    } catch (error) {
+      return next(defaultError("Ошибка сервера!"));
+    }
   }
 
   async deleteCardById(req: IRequest, res: Response, next: NextFunction) {
     try {
       const { cardId } = req.params;
       const deleteCard = await card.findByIdAndDelete(cardId);
+      if (!deleteCard) {
+        return next(notFoundError("Карточка с указанным _id не найдена!"));
+      }
       return res.send({
-        message: "Card is deleted",
+        message: "Карточка удалена",
       });
-    } catch (error) {}
+    } catch (error) {
+      return next(defaultError("Ошибка сервера!"));
+    }
   }
 
   async createCard(req: IRequest, res: Response, next: NextFunction) {
@@ -59,8 +67,13 @@ class CardController implements ICardController {
       const { name, link } = req.body;
       const newCard = await card.create({ name, link, owner: id });
       return res.send(newCard);
-    } catch (error: any) {
-      return next(error.message);
+    } catch (error) {
+      if (error instanceof Error && error.name === "ValidationError") {
+        return next(
+          dataError("Переданы некорректные данные при создании карточки!")
+        );
+      }
+      return next(defaultError("Ошибка сервера!"));
     }
   }
 
@@ -68,10 +81,22 @@ class CardController implements ICardController {
     try {
       const id = req.user?._id;
       const { cardId } = req.params;
-      const likeCard = await card.findByIdAndUpdate(cardId, { $addToSet: { likes: id } }, {new: true});
+      const likeCard = await card.findByIdAndUpdate(
+        cardId,
+        { $addToSet: { likes: id } },
+        { new: true }
+      );
+      if (!likeCard) {
+        return next(notFoundError("Передан несуществующий _id карточки!"));
+      }
       return res.send(likeCard);
-    } catch (error: any) {
-      return next(error.message);
+    } catch (error) {
+      if (error instanceof Error && error.name === "CastError") {
+        return next(
+          dataError("Переданы некорректные данные для постановки лайка!")
+        );
+      }
+      return next(defaultError("Ошибка сервера!"));
     }
   }
 
@@ -79,10 +104,22 @@ class CardController implements ICardController {
     try {
       const id = req.user?._id as ObjectId;
       const { cardId } = req.params;
-      const dislikeCard = await card.findByIdAndUpdate(cardId, { $pull: { likes: id } }, {new: true});
+      const dislikeCard = await card.findByIdAndUpdate(
+        cardId,
+        { $pull: { likes: id } },
+        { new: true }
+      );
+      if (!dislikeCard) {
+        return next(notFoundError("Передан несуществующий _id карточки!"));
+      }
       return res.send(dislikeCard);
-    } catch (error: any) {
-      return next(error.message);
+    } catch (error) {
+      if (error instanceof Error && error.name === "CastError") {
+        return next(
+          dataError("Переданы некорректные данные для снятии лайка!")
+        );
+      }
+      return next(defaultError("Ошибка сервера!"));
     }
   }
 }
