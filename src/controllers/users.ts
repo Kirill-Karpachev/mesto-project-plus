@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-import user from "../models/user";
-import { IRequest } from "types/types";
-import { dataError, defaultError, notFoundError } from "../error/error";
+import { Request, Response, NextFunction } from 'express';
+import user from '../models/user';
+import { IRequest } from '../types/types';
+import { dataError, defaultError, notFoundError } from '../error/error';
 
 interface IUserController {
   getUsers(
@@ -41,7 +41,7 @@ class UsersController implements IUserController {
       const users = await user.find({});
       return res.send({ data: users });
     } catch (error) {
-      return next(defaultError("Ошибка сервера!"));
+      return next(defaultError('Ошибка сервера!'));
     }
   }
 
@@ -51,11 +51,16 @@ class UsersController implements IUserController {
 
       const userById = await user.findById(userId);
       if (!userById) {
-        return next(notFoundError("Пользователь с указанным _id не найден!"));
+        return next(notFoundError('Пользователь с указанным _id не найден!'));
       }
       return res.send({ data: userById });
     } catch (error) {
-      return next(defaultError("Ошибка сервера!"));
+      if (error instanceof Error && error.name === 'CastError') {
+        return next(
+          dataError('Переданы некорректный id!'),
+        );
+      }
+      return next(defaultError('Ошибка сервера!'));
     }
   }
 
@@ -65,13 +70,13 @@ class UsersController implements IUserController {
       const newUser = await user.create({ name, about, avatar });
       return res.send(newUser);
     } catch (error) {
-      if (error instanceof Error && error.name === "ValidationError") {
+      if (error instanceof Error && error.name === 'ValidationError') {
         return next(
-          dataError("Переданы некорректные данные при создании пользователя!")
+          dataError('Переданы некорректные данные при создании пользователя!'),
         );
       }
 
-      return next(defaultError("Ошибка сервера!"));
+      return next(defaultError('Ошибка сервера!'));
     }
   }
 
@@ -82,19 +87,19 @@ class UsersController implements IUserController {
       const updateUser = await user.findByIdAndUpdate(
         id,
         { name, about },
-        { new: true }
+        { new: true, runValidators: true },
       );
       if (!updateUser) {
-        return next(notFoundError("Пользователь с указанным _id не найден!"));
+        return next(notFoundError('Пользователь с указанным _id не найден!'));
       }
       return res.send({ data: updateUser });
     } catch (error) {
-      if (error instanceof Error && error.name === "ValidationError") {
+      if (error instanceof Error && error.name === 'ValidationError') {
         return next(
-          dataError("Переданы некорректные данные при обновлении профиля!")
+          dataError('Переданы некорректные данные при обновлении профиля!'),
         );
       }
-      return next(defaultError("Ошибка сервера!"));
+      return next(defaultError('Ошибка сервера!'));
     }
   }
 
@@ -105,19 +110,19 @@ class UsersController implements IUserController {
       const updateUser = await user.findByIdAndUpdate(
         id,
         { avatar },
-        { new: true }
+        { new: true, runValidators: true },
       );
       if (!updateUser) {
-        return next(notFoundError("Пользователь с указанным _id не найден!"));
+        return next(notFoundError('Пользователь с указанным _id не найден!'));
       }
       return res.send({ data: updateUser });
     } catch (error) {
-      if (error instanceof Error && error.name === "ValidationError") {
+      if (error instanceof Error && error.name === 'ValidationError') {
         return next(
-          dataError("Переданы некорректные данные при обновлении аватара!")
+          dataError('Переданы некорректные данные при обновлении аватара!'),
         );
       }
-      return next(defaultError("Ошибка сервера!"));
+      return next(defaultError('Ошибка сервера!'));
     }
   }
 }

@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import card from "../models/card";
-import { IRequest } from "types/types";
-import { ObjectId } from "mongoose";
-import { dataError, defaultError, notFoundError } from "../error/error";
+import { Request, Response, NextFunction } from 'express';
+import { ObjectId } from 'mongoose';
+import card from '../models/card';
+import { IRequest } from '../types/types';
+import { dataError, defaultError, notFoundError } from '../error/error';
 
 interface ICardController {
   getCards(
@@ -42,7 +42,7 @@ class CardController implements ICardController {
       const cards = await card.find({});
       return res.send({ data: cards });
     } catch (error) {
-      return next(defaultError("Ошибка сервера!"));
+      return next(defaultError('Ошибка сервера!'));
     }
   }
 
@@ -51,13 +51,18 @@ class CardController implements ICardController {
       const { cardId } = req.params;
       const deleteCard = await card.findByIdAndDelete(cardId);
       if (!deleteCard) {
-        return next(notFoundError("Карточка с указанным _id не найдена!"));
+        return next(notFoundError('Карточка с указанным _id не найдена!'));
       }
       return res.send({
-        message: "Карточка удалена",
+        message: 'Карточка удалена',
       });
     } catch (error) {
-      return next(defaultError("Ошибка сервера!"));
+      if (error instanceof Error && error.name === 'ValidationError') {
+        return next(
+          dataError('Передан некорректный id!'),
+        );
+      }
+      return next(defaultError('Ошибка сервера!'));
     }
   }
 
@@ -68,12 +73,12 @@ class CardController implements ICardController {
       const newCard = await card.create({ name, link, owner: id });
       return res.send(newCard);
     } catch (error) {
-      if (error instanceof Error && error.name === "ValidationError") {
+      if (error instanceof Error && error.name === 'ValidationError') {
         return next(
-          dataError("Переданы некорректные данные при создании карточки!")
+          dataError('Переданы некорректные данные при создании карточки!'),
         );
       }
-      return next(defaultError("Ошибка сервера!"));
+      return next(defaultError('Ошибка сервера!'));
     }
   }
 
@@ -84,19 +89,19 @@ class CardController implements ICardController {
       const likeCard = await card.findByIdAndUpdate(
         cardId,
         { $addToSet: { likes: id } },
-        { new: true }
+        { new: true, runValidators: true },
       );
       if (!likeCard) {
-        return next(notFoundError("Передан несуществующий _id карточки!"));
+        return next(notFoundError('Передан несуществующий _id карточки!'));
       }
       return res.send(likeCard);
     } catch (error) {
-      if (error instanceof Error && error.name === "CastError") {
+      if (error instanceof Error && error.name === 'CastError') {
         return next(
-          dataError("Переданы некорректные данные для постановки лайка!")
+          dataError('Переданы некорректные данные для постановки лайка!'),
         );
       }
-      return next(defaultError("Ошибка сервера!"));
+      return next(defaultError('Ошибка сервера!'));
     }
   }
 
@@ -107,19 +112,19 @@ class CardController implements ICardController {
       const dislikeCard = await card.findByIdAndUpdate(
         cardId,
         { $pull: { likes: id } },
-        { new: true }
+        { new: true, runValidators: true },
       );
       if (!dislikeCard) {
-        return next(notFoundError("Передан несуществующий _id карточки!"));
+        return next(notFoundError('Передан несуществующий _id карточки!'));
       }
       return res.send(dislikeCard);
     } catch (error) {
-      if (error instanceof Error && error.name === "CastError") {
+      if (error instanceof Error && error.name === 'CastError') {
         return next(
-          dataError("Переданы некорректные данные для снятии лайка!")
+          dataError('Переданы некорректные данные для снятии лайка!'),
         );
       }
-      return next(defaultError("Ошибка сервера!"));
+      return next(defaultError('Ошибка сервера!'));
     }
   }
 }

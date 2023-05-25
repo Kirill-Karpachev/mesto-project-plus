@@ -1,5 +1,5 @@
-import { ObjectId, Schema } from "mongoose";
-import { Request } from "express";
+import { ObjectId, Schema } from 'mongoose';
+import { Request } from 'express';
 
 export interface ICard {
   name: string;

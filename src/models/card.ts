@@ -1,11 +1,11 @@
-import { model, Schema } from "mongoose";
-import { ICard } from "types/types";
+import { model, Schema } from 'mongoose';
+import { ICard } from '../types/types';
 
 const cardSchema = new Schema<ICard>({
   name: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minLength: 2,
+    maxLength: 30,
     required: true,
   },
   link: {
@@ -28,4 +28,4 @@ const cardSchema = new Schema<ICard>({
   },
 });
 
-export default model<ICard>("card", cardSchema);
+export default model<ICard>('card', cardSchema);

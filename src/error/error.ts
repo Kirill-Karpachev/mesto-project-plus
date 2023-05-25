@@ -1,5 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { StatusCode } from "../types/code.types";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Request, Response, NextFunction } from 'express';
+import StatusCode from '../types/code.types';
 
 export class RequestError extends Error {
   statusCode: StatusCode;
@@ -10,20 +11,21 @@ export class RequestError extends Error {
   }
 }
 
-const defaultError = (message: string) => {
-  return new RequestError(StatusCode.ERROR_DEFAULT_CODE, message);
-};
+const defaultError = (message: string) => new RequestError(StatusCode.ERROR_DEFAULT, message);
 
-const dataError = (message: string) => {
-  return new RequestError(StatusCode.ERROR_DATA_CODE, message);
-};
+const dataError = (message: string) => new RequestError(StatusCode.ERROR_DATA, message);
 
-const notFoundError = (message: string) => {
-  return new RequestError(StatusCode.ERROR_NOT_FOUND_CODE, message);
-};
+const notFoundError = (message: string) => new RequestError(StatusCode.ERROR_NOT_FOUND, message);
 
-const sendMessageError = (err: any, req: Request, res: Response, next: NextFunction) => {
+const sendMessageError = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   res.status(err.statusCode).send({ message: err.message });
-}
+};
 
-export { defaultError, dataError, notFoundError, sendMessageError };
+export {
+  defaultError, dataError, notFoundError, sendMessageError,
+};

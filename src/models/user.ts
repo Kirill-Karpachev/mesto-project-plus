@@ -1,17 +1,17 @@
-import { Schema, model } from "mongoose";
-import { IUser } from "types/types";
+import { Schema, model } from 'mongoose';
+import { IUser } from '../types/types';
 
 const userSchema = new Schema<IUser>({
   name: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minLength: 2,
+    maxLength: 30,
     required: true,
   },
   about: {
     type: String,
-    minlength: 2,
-    maxlength: 200,
+    minLength: 2,
+    maxLength: 200,
     required: true,
   },
   avatar: {
@@ -20,4 +20,4 @@ const userSchema = new Schema<IUser>({
   },
 });
 
-export default model<IUser>("user", userSchema);
+export default model<IUser>('user', userSchema);

@@ -1,5 +1,8 @@
-export enum StatusCode {
-  ERROR_DATA_CODE = 400,
-  ERROR_NOT_FOUND_CODE = 404,
-  ERROR_DEFAULT_CODE = 500,
+// eslint-disable-next-line no-shadow
+enum StatusCode {
+  ERROR_DATA = 400,
+  ERROR_NOT_FOUND = 404,
+  ERROR_DEFAULT = 500,
 }
+
+export default StatusCode;
