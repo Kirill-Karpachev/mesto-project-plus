@@ -57,7 +57,7 @@ class CardController implements ICardController {
         message: 'Карточка удалена',
       });
     } catch (error) {
-      if (error instanceof Error && error.name === 'ValidationError') {
+      if (error instanceof Error && error.name === 'CastError') {
         return next(
           dataError('Передан некорректный id!'),
         );
