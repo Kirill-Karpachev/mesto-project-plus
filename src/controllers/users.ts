@@ -58,7 +58,7 @@ class UsersController implements IUserController {
 
       const currentUser = await user.findById(id);
       if (!currentUser) {
-        return next(authError('Требуемый пользователь не найден!'));
+        return next(authError('Необходима авторизация!'));
       }
 
       return res.send(currentUser);

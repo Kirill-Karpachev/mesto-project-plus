@@ -6,11 +6,13 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
+import { errors } from 'celebrate';
 import routers from './routes';
 import { requestLogger, errorLogger } from './middlewares/logger';
-import { sendMessageError } from './error/error';
-import UsersController from './controllers/users';
 import auth from './middlewares/auth';
+import { sendMessageError } from './error/error';
+import { loginValidation, createUserValidation } from './middlewares/validation';
+import UsersController from './controllers/users';
 
 const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
 const limiter = rateLimit({
@@ -28,13 +30,14 @@ app.use(json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 
-app.post('/signin', UsersController.login);
-app.post('/signup', UsersController.createUser);
+app.post('/signin', loginValidation, UsersController.login);
+app.post('/signup', createUserValidation, UsersController.createUser);
 
 app.use(cookieParser());
 app.use('/', auth, routers);
 
 app.use(errorLogger);
+app.use(errors());
 app.use(sendMessageError);
 
 async function connection() {
