@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import routers from './routes';
+import { requestLogger, errorLogger } from './middlewares/logger';
 import { sendMessageError } from './error/error';
 import UsersController from './controllers/users';
 import auth from './middlewares/auth';
@@ -25,12 +26,15 @@ app.use(helmet());
 app.use(limiter);
 app.use(json());
 app.use(express.urlencoded({ extended: true }));
+app.use(requestLogger);
 
 app.post('/signin', UsersController.login);
 app.post('/signup', UsersController.createUser);
 
 app.use(cookieParser());
 app.use('/', auth, routers);
+
+app.use(errorLogger);
 app.use(sendMessageError);
 
 async function connection() {
