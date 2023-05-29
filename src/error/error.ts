@@ -17,6 +17,12 @@ const dataError = (message: string) => new RequestError(StatusCode.ERROR_DATA, m
 
 const notFoundError = (message: string) => new RequestError(StatusCode.ERROR_NOT_FOUND, message);
 
+const authError = (message: string) => new RequestError(StatusCode.ERROR_AUTH, message);
+
+const conflictError = (message: string) => new RequestError(StatusCode.ERROR_CONFLICT, message);
+
+const forbiddenError = (message: string) => new RequestError(StatusCode.ERROR_FORBIDDEN, message);
+
 const sendMessageError = (
   err: any,
   req: Request,
@@ -27,5 +33,6 @@ const sendMessageError = (
 };
 
 export {
-  defaultError, dataError, notFoundError, sendMessageError,
+  defaultError, dataError, notFoundError, authError,
+  sendMessageError, conflictError, forbiddenError,
 };
