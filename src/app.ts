@@ -32,6 +32,7 @@ app.use(requestLogger);
 
 app.post('/signin', loginValidation, UsersController.login);
 app.post('/signup', createUserValidation, UsersController.createUser);
+app.get('/signout', UsersController.logout);
 
 app.use(cookieParser());
 app.use('/', auth, routers);

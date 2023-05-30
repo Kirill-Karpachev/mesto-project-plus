@@ -55,15 +55,14 @@ class CardController implements ICardController {
       const { cardId } = req.params;
 
       const findCard = await card.findById(cardId);
+      if (!findCard) {
+        return next(notFoundError('Карточка с указанным _id не найдена!'));
+      }
       if (id !== findCard?.owner.toString()) {
         return next(forbiddenError('Нет прав для удаления!'));
       }
 
-      const deleteCard = await card.findByIdAndDelete(cardId);
-      if (!deleteCard) {
-        return next(notFoundError('Карточка с указанным _id не найдена!'));
-      }
-
+      await card.findByIdAndDelete(cardId);
       return res.send({
         message: 'Карточка удалена!',
       });

@@ -49,6 +49,12 @@ interface IUserController {
     res: Response,
     next: NextFunction
   ): Promise<void | Response>;
+
+  logout(
+    req: IRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void | Response>;
 }
 
 class UsersController implements IUserController {
@@ -114,6 +120,7 @@ class UsersController implements IUserController {
         name, about, avatar, email, password: hashPassword,
       });
 
+      newUser.toJSON();
       return res.send(newUser);
     } catch (error) {
       if (error instanceof Error && error.name === 'ValidationError') {
@@ -196,7 +203,7 @@ class UsersController implements IUserController {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
         sameSite: true,
-      }).end();
+      }).send({ message: 'Авторизация успешна!' });
     } catch (error) {
       if (error instanceof Error && error.name === 'ValidationError') {
         return next(
@@ -205,6 +212,14 @@ class UsersController implements IUserController {
       }
 
       return next(defaultError('Ошибка сервера!'));
+    }
+  }
+
+  async logout(req: IRequest, res: Response, next: NextFunction) {
+    try {
+      return res.clearCookie('jwt').send({ message: 'Выход успешен!' });
+    } catch (err) {
+      return next(err);
     }
   }
 }
